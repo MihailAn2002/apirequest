@@ -1,26 +1,46 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <AddProduct />
+    <EditProduct v-if="selectedProduct" :product="selectedProduct" />
+    <ProductList @edit="selectProduct" />
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import { ref, onMounted } from 'vue';
+import { useProductStore } from '@/stores/productStore';
+
+import AddProduct from './components/AddProduct.vue'
+import EditProduct from './components/EditProduct.vue'
+import ProductList from './components/ProductList.vue'
 
 export default {
-  name: 'App',
+  name: 'App', 
   components: {
-    HelloWorld
-  }
+    AddProduct,  
+    EditProduct, 
+    ProductList,
+  },
+  setup() {
+    const store = useProductStore();
+    const selectedProduct = ref(null);
+
+    // Загружаем данные при монтировании компонента
+    onMounted(() => {
+      store.loadProducts();
+    });
+
+    // Функция для выбора продукта для редактирования
+    const selectProduct = (product) => {
+      selectedProduct.value = product;
+    };
+
+    return { selectedProduct, selectProduct, loading: store.loading, error: store.error };
+
+  },
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+/* Стили */
 </style>
